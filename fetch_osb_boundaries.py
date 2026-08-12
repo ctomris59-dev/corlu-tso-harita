@@ -31,12 +31,12 @@ SLEEP_SECONDS = 1.1
 
 # (Haritada gösterilecek etiket, Nominatim'de aranacak sorgu)
 OSB_LIST = [
-    ("Ulaş OSB", "Ulaş Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
-    ("Vakıflar OSB", "Vakıflar Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
+    ("Ergene-1 Organize Sanayi Bölgesi", "Ergene-1 Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
+    ("Ergene-2 Organize Sanayi Bölgesi ", "Ergene-2 Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
     ("Velimeşe OSB", "Velimeşe Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
-    ("Çorlu Deri OSB", "Çorlu Deri Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
+    ("Çorlu Deri OSB", "Çorlu Deri Karma Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
     ("Türkgücü OSB", "Türkgücü Organize Sanayi Bölgesi, Çorlu, Tekirdağ, Türkiye"),
-    ("Ergene 2. OSB", "Ergene 2. Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
+    ("Ergene 2. OSB", "Ergene-2 Organize Sanayi Bölgesi, Ergene, Tekirdağ, Türkiye"),
     ("Avrupa Serbest Bölgesi", "Avrupa Serbest Bölgesi, Ergene, Tekirdağ, Türkiye"),
 ]
 
