@@ -47,6 +47,12 @@ REGION_HINT = ", Tekirdağ, Türkiye"
 VIEWBOX = "26.9,41.35,28.3,40.75"  # Çorlu/Ergene/Marmaraereğlisi çevresi
 SLEEP_SECONDS = 1.1  # Nominatim kuralı: saniyede en fazla 1 istek
 
+# Bazı ağlardan (özellikle bazı Türkiye ISS'lerinden) photon.komoot.io'ya
+# erişim çok yavaş/zaman aşımına uğrayabiliyor. Varsayılan olarak kapalı -
+# yalnızca Nominatim kullanılır. Kendi ağınızda Photon hızlı çalışıyorsa
+# True yapıp tekrar deneyebilirsiniz (bazı adresleri ek olarak bulabilir).
+USE_PHOTON = False
+
 # OSB / sanayi sitesi adı bulunamazsa, hiçbir sonuç çıkmayan adresler için
 # mutlak son çare: ilçe merkezine düş (kaba/yaklaşık konum olarak işaretlenir,
 # haritada farklı bir işaretle gösterilir).
@@ -107,7 +113,9 @@ def nominatim_search(query: str):
 def photon_search(query: str):
     """Komoot'un ücretsiz, açık kaynaklı geocoder'ı. Aynı OSM verisini farklı
     bir arama motoruyla (Elasticsearch tabanlı, serbest metin) tarar - bu
-    yüzden Nominatim'in bulamadığı bazı adresleri bulabilir."""
+    yüzden Nominatim'in bulamadığı bazı adresleri bulabilir. Yedek servis
+    olarak kullanılıyor; bazı ağlardan yavaş yanıt verebildiği için kısa bir
+    zaman aşımı (timeout) uygulanıyor."""
     url = (
         "https://photon.komoot.io/api/?"
         + urllib.parse.urlencode(
@@ -115,7 +123,7 @@ def photon_search(query: str):
         )
     )
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=15) as resp:
+    with urllib.request.urlopen(req, timeout=6) as resp:
         data = json.loads(resp.read().decode("utf-8"))
         feats = data.get("features") or []
         if feats:
@@ -125,9 +133,12 @@ def photon_search(query: str):
 
 
 def search_both(query: str):
-    """Aynı sorguyu önce Photon, sonra Nominatim'de dener (ikisi de ücretsiz,
-    ikisi de OSM tabanlı ama farklı arama mantığı kullanıyor)."""
-    for fn, name in ((photon_search, "photon"), (nominatim_search, "nominatim")):
+    """Önce Nominatim'de dener; USE_PHOTON açıksa ve Nominatim sonuç
+    vermezse Photon'u yedek olarak dener."""
+    providers = [(nominatim_search, "nominatim")]
+    if USE_PHOTON:
+        providers.append((photon_search, "photon"))
+    for fn, name in providers:
         try:
             result = fn(query)
             time.sleep(SLEEP_SECONDS)
@@ -192,7 +203,8 @@ def main():
 
     # İki servis (Photon + Nominatim) art arda denendiği için önceki tahmine göre
     # biraz daha uzun sürebilir; kaba bir üst sınır veriyoruz.
-    est_minutes = round(total_todo * SLEEP_SECONDS * 2.2 / 60)
+    multiplier = 2.2 if USE_PHOTON else 1.6
+    est_minutes = round(total_todo * SLEEP_SECONDS * multiplier / 60)
     print(f"Tahmini süre: ~{est_minutes} dakika (çoğu adres daha erken bulunacağı için genelde daha kısa sürer)\n")
 
     found = 0
