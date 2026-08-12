@@ -10,6 +10,29 @@ bazında haritada gösteren, aranabilir bir web uygulaması.
   faaliyet, ve varsa enlem/boylam).
 - **`geocode.py`** — adresleri harita koordinatına çeviren, kendi
   bilgisayarınızda bir kez çalıştırdığınız Python betiği.
+- **`fetch_osb_boundaries.py`** — (opsiyonel) OSB sınırlarını OpenStreetMap'ten
+  çekip `osb-boundaries.json` üretir; haritada OSB alanlarını hafif renkli
+  bölgeler olarak gösterir.
+
+## Yeni özellikler
+
+- **Yol Tarifi Al** — her firma popup'ında ve liste kartında, Google Maps'e
+  yönlendirme modunda açan buton.
+- **Kuş uçuşu erişim mesafesi** — her firma popup'ında İstanbul, TEM Otoyolu,
+  Tekirdağ Limanı, Çorlu ve İstanbul Havalimanı'na yaklaşık mesafe.
+- **Paylaşılabilir bağlantı** — filtre uyguladığınızda URL otomatik güncellenir
+  (`?sektor=...&ilce=...`); üstteki "🔗 Bağlantıyı Kopyala" butonuyla o anki
+  filtrelenmiş görünümün linkini kopyalayabilirsiniz.
+- **Sektörel Dağılım** — üstteki "📊 İstatistikler" butonu, tüm sektörlerin
+  üye sayısını bar grafik olarak gösterir.
+- **OSB sınırları** — `osb-boundaries.json` dosyası varsa, haritada ilgili
+  OSB'ler hafif yeşil/çizgili bir alan olarak görünür (bkz. aşağıdaki adım).
+- **Son güncelleme etiketi** — sayfa altında üye listesinin ve konum verisinin
+  ne zaman alındığı otomatik gösterilir.
+- **"Bu bilgi hatalı, bildir"** — her popup'ta, TSO'ya doğrudan e-posta
+  taslağı açan bir bildirim linki (adresi `proje@corlutso.org.tr` olarak
+  ayarlanmış — kendi resmi e-posta adresinizle değiştirmek isterseniz
+  `index.html` içinde `reportUrl` fonksiyonundaki adresi güncelleyin).
 
 ## 1) Konumları oluşturun (ilk kurulumda bir kez)
 
@@ -42,19 +65,32 @@ python geocode.py
   yeniden ürettiğinizde), betiği tekrar çalıştırmanız yeterli — sadece
   konumu olmayan yeni kayıtlar için istek atar, eskileri tekrar sorgulamaz.
 
-## 2) GitHub Pages'te yayınlama
+## 2) OSB sınırlarını ekleyin (opsiyonel ama önerilir)
+
+```bash
+python fetch_osb_boundaries.py
+```
+
+- Ulaş OSB, Vakıflar OSB, Velimeşe OSB, Çorlu Deri OSB, Türkgücü OSB, Ergene 2.
+  OSB ve Avrupa Serbest Bölgesi için OpenStreetMap'te sınır poligonu arar.
+- Bazıları OSM'de haritalı olmayabilir — bulunamayanlar sessizce atlanır,
+  hata vermez.
+- `osb-boundaries.json` dosyasını üretir; bunu da diğer dosyalarla birlikte
+  GitHub'a yüklemeniz yeterli, `index.html` otomatik algılar.
+
+## 3) GitHub Pages'te yayınlama
 
 1. GitHub'da yeni bir repo oluşturun (herkese açık bir site istiyorsanız
    **public**; erişimi kısıtlamak istiyorsanız GitHub Enterprise/Pro plan
    gerekir, aksi halde Pages özelliği repo'nun herkese açık olmasını gerektirir).
-2. Bu üç dosyayı (`index.html`, `companies.json`, konumlar oluşturulmuş
-   haliyle) repo'nun **ana dizinine** yükleyin.
+2. Bu dosyaları (`index.html`, `companies.json`, konumlar oluşturulmuş
+   haliyle, ve varsa `osb-boundaries.json`) repo'nun **ana dizinine** yükleyin.
 3. Repo → **Settings → Pages** → *Source*: `Deploy from a branch` →
    Branch: `main` / `root` seçip kaydedin.
 4. Birkaç dakika içinde site şu adreste yayında olur:
    `https://<kullanici-adiniz>.github.io/<repo-adi>/`
 
-## 3) Veri güncellendiğinde
+## 4) Veri güncellendiğinde
 
 TSO'dan yeni bir üye listesi aldığınızda:
 
