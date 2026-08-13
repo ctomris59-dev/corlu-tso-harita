@@ -93,6 +93,37 @@ def search_polygon(query: str):
     return None
 
 
+def search_point(query: str):
+    """Poligon bulunamazsa son çare: sadece bir nokta (enlem/boylam) ara."""
+    url = (
+        "https://nominatim.openstreetmap.org/search?"
+        + urllib.parse.urlencode(
+            {"format": "json", "limit": 1, "countrycodes": "tr", "q": query}
+        )
+    )
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+        if data:
+            return float(data[0]["lat"]), float(data[0]["lon"])
+    return None
+
+
+def circle_polygon(lat, lng, radius_m=450, points=24):
+    """Bir nokta etrafında yaklaşık bir daire poligonu üretir (gerçek OSB
+    sınırı OSM'de yoksa, en azından firmaların o bölgeye dağılabileceği
+    makul bir alan tanımlamak için kullanılır)."""
+    import math
+    coords = []
+    lat_rad = math.radians(lat)
+    deg_lat = radius_m / 111320.0
+    deg_lng = radius_m / (111320.0 * math.cos(lat_rad) + 1e-9)
+    for i in range(points + 1):
+        angle = 2 * math.pi * i / points
+        coords.append([lng + deg_lng * math.cos(angle), lat + deg_lat * math.sin(angle)])
+    return {"type": "Polygon", "coordinates": [coords]}
+
+
 def main():
     existing = {}
     try:
@@ -132,7 +163,28 @@ def main():
             })
             print("BULUNDU (poligon)")
         else:
-            print("bulunamadı (OSM'de poligon olarak haritalanmamış olabilir)")
+            # Gerçek poligon yoksa, en azından bir nokta bulup etrafında
+            # yaklaşık bir daire (500m yarıçap) oluşturuyoruz - hiçbir OSB
+            # tamamen kapsam dışı kalmasın diye.
+            point = None
+            for query in queries:
+                try:
+                    point = search_point(query)
+                except Exception:
+                    point = None
+                time.sleep(SLEEP_SECONDS)
+                if point:
+                    break
+            if point:
+                lat, lng = point
+                features.append({
+                    "type": "Feature",
+                    "properties": {"name": label, "approx_circle": True},
+                    "geometry": circle_polygon(lat, lng),
+                })
+                print("BULUNDU (nokta + ~500m yaklaşık daire)")
+            else:
+                print("bulunamadı (OSM'de ne poligon ne de nokta olarak haritalanmış)")
 
     fc = {"type": "FeatureCollection", "features": features}
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
