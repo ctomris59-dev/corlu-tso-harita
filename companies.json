@@ -4834,18 +4834,6 @@
    "approx": true
   },
   {
-   "id": 393,
-   "unvan": "EMATEKS YÜN İPLİK SANAYİ VE TİCARET ANONİM ŞİRKETİ ÇORLU 1 ŞUBESİ",
-   "adres": "İSTASYON CADDESİ ERGENE",
-   "ilce": "Ergene",
-   "sectorIdx": 14,
-   "subIdx": 0,
-   "faaliyet": "Başka ülkeyle yapılan uzmanlaşmamış toptan ticaret",
-   "lat": 41.262224,
-   "lng": 27.9371545,
-   "approx": null
-  },
-  {
    "id": 394,
    "unvan": "COŞKUN KAUÇUK SANAYİ VE TİCARET ANONİM ŞİRKETİ VELİMEŞE OSB OSB OSB ŞUBESİ",
    "adres": "VELİMEŞE OSB",
