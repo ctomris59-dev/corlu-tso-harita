@@ -1126,6 +1126,7 @@ async function init(){
 
   applyFilters();
   loadOsbBoundaries();
+  populateInvestorSectors();
 
   const missing = COMPANIES.filter(c => c.lat == null).length;
   if(missing > 0){
